@@ -1,97 +1,112 @@
-# 🏗️
-🚧UNDER CONSTRUCTION 🚧
 
-# impermanent
-(im)permission structures which promote the autonomy of contributors
+# impermission
 
-This document is just some brainstorming of possible alternative code ownership
-structures. 
+_(im)permission structures which promote the autonomy of contributors_
 
-______
+## Problem
 
-Scheme Attributes: 
+The existing codebase management structures of git-extending systems (ex.
+github, gitlab) are oriented towards hierarchical control of the codebase with
+final decision making power residing at the account or organization owners of a
+particular fork. Within github this power can be partially extended to
+non-owners of the repository but which has been revocably designated as
+"code-owners" (which is perhaps a misnomer).  
 
- - By file: the code contributions lines to a file determine the amount of
-        ownership of that file 
- - By directory: if you've contributed a certain amount within a directory, you
-        have ownership over that directory 
-          - this should also include subdirectories, as well as parent directories but
-          at different rates
- - By project: this is an extension of the idea of the by directory, where the
-        entire project is just a top level directory. 
- - By file type: editing code, should give you ownership of documentation, but
-        not vice-versa
- - By change kind: commits of new features, or algorithm changes should be
-        weighted substantially more than refactors. 
- - By replacement: If you replace somebodies code, you should effectively
-        overtaking their ownership over those lines of code, and those algorithms. 
-          - If somebody has been highly inactive for a long time, they will
-          incrementally lose their ownership
- - Viewable/Verifiable Permissioning Schemes: the calculation of the permission
-        schemes shouldn't _need_ to be calculated based on historical git commits, but
-        should instead be a real-time ongoing calculation in a separate file, so it's 
-        very easy to verify all the different scores off the bat. The permission schemes
-        _should_ be allowed to be manually editted, with some certain level of
-        high consensus
- - Lock permissions: certain files or lines require certain special permissions
-        to change
- - Consensus Level:  The level of consensus required to change a file (certain
-        files could be critical and require a high level of consensus) 
+Within open-source software, for stakeholder sets which do not rely on
+coordinating around a single fork of a codebase the fork based model can be
+viewed as sufficient; if any user of a codebase require alternative
+functionality than what is provided in the base fork, that user may simply fork
+that codebase, whereby within the new fork they gain full autonomy to modify
+that codebase to meet their needs. If they view that their changes may be
+beneficial to the wider community then they can open up a pull (or merge)
+request to the original repository whereby the owners of the original
+repository must approve said change. 
 
+For decentralized stakeholder sets which _do_ reply on coordinating around a
+consistent codebase, the fork based model fails to accommodate for any complex
+decision structures beyond that which the account/organization owners serve as
+the gatekeepers and interpreters of all decisions made. 
 
-Implimentation thought: this probably should _not_ exist as code comments on
-each file as to keep with interoperability, all different kinds of code have
-different comment styles. This should probably instead exist as a `.PERM.md`
-file within each directory
+This becomes problematic as the needs of the user and developer communities
+of a codebase outgrow the capabilities of the codebase
+account/organization owners. Some ways which this outgrowth may occur:
+ - Throughput; the owners no longer have the enough capacity (either
+   individually or through delegation) to evaluate time sensitive changes which
+   must be made to the codebase. 
+ - Understanding; the owners no longer understand newly developed sections of
+   the codebase and are therefor are potentially no more qualified to judge its
+   modifications than other developers with a similar general understanding of the
+   codebase.
+ - Conflict; the community consensus of best actions for codebase modifications
+   differ from that of the repository owners. 
 
-Layout of `.PERM.md`: 
-```
-Last update: <insert code hash> 
+## Solution
 
-Subdirectory Downward Ownership: 1.00 // how much this directory owns all subdirectories
-Subdirectory Upward Ownership:   0.10 // how much subdirectories own this directory
-Sideways Ownership: 0.30              // ownership exibited from files in this directory to the whole directory
+A short-sighted perspective may that it is good enough for a community to
+organize and "fork-out" the original repository owners of a repo however this
+is not a truly a solution, as it just reproduces the same hierarchical model
+accept with different actors, as well this (non-)solution neglects to take into
+consideration potential information-flow inertia which would preference the use
+of the original code base (due to for example, number of page-views or github
+stars/forks). 
 
-Override <dir-name> Downward Ownership: 0.22 // override for particular directory
-Override <dir-name> Upward Ownership: 0.55 // override for particular directory
-...
+Any true to solution should have consideration for the following factors: 
+ - Safety; sufficient options for safety checks and file and/or import locks
+   should be available such that risk of integration of malicious code is
+   minimized.
+ - Adaptability; the permission sets of code contributors should be based dynamically
+   on the active contributions and their acknowledged merits from the wider community, 
+   as well discretized to the kind/form/locality of code contributions. 
+ - Tyranny of majority; code changes should not simply be based on the whims of
+   what the majority of users want, they must be based on a strategy for
+   long-term codebase success. A simple solution is to develop an agreeable rule
+   set whereby the majority acknowledge expertise of specialized individuals and
+   democratically and revocably grant them specialized extended permissions.  
 
-// these filetypes count for modifying all filetypes, 
-// anything not in this list is constrained to its own filetype
-FILETYPES MASTER: go, sh
+### Implementation
 
-CHANGEKIND MOVE: GET 
+One implementation would be to include a number of dot-files (`.PERM`)
+at every folder level which act to parameterize the permissioning mechanisms
+(PMs) and also further discretize these permissions to the sub-package level.
+The dot-files are then interpreted by the PMs within the (git-extending) host
+of the code during pull requests. Other input such as approvals made
+through pull requests (in the form of comments, reviews etc.) could also be
+utilized by the PMs in order to perform the final merge of pull requests.
 
-ALIASNAME <insert name> <insert pubkey>
-...
+The continuous updating of permission levels of developers could be
+automatically (or not automatically) handled based pre-agreed upon metrics or
+votes by which developer permissions change. As an example, if the permission 
+level was based on quantity of code contributions, the permission level stored
+within the dot-files could be automatically updated based with each commit.
 
+Further, the updating of fundamental parameterization and mechanisms of the PMs
+could be updated through the same process as the dot-files which define the
+mechanism and associated parameters are held _within_ the git repository.  
 
-// ownership is to be calculated based on contributions and sideways ownership
-OWNERSHIP OF DIRECTORY
-<name>  0.120
-<name>  0.230
-<name>  0.650 // these must add to 1
+### Challenges 
 
-// ownership is to be calculated based on contributions
-OWNERSHIP <filename> 
-<name>  0.120
-<name>  0.230
-<name>  0.650 // these must add to 1
-... 
+The most obvious challenge is the classification of appropriate metrics /
+voting procedures for which the permissions mechanisms adapt-from and are built
+upon. Abstracting a wide base of possible initial solutions for any code
+community to begin with is vital for the utility of this impermission project.
+For thought, some initial metrics worth exploration include:
+ - characters changes of code
+ - characters changes of code comments
+ - number of logical operators and definitions
+In addition these metrics may be weighted by agreed upon significance of:
+ - a package, file, or function etc., 
+ - contributions from specific users, 
+ - approval from specific users.  
 
-LOCKFILE <filename> <name> // this key must sign to modify this file
-... 
+### Implementation Steps
 
-CONSENSUS LEVEL <filename> 0.40, 0.51 // minimum signatures, consensus agreeing with the changes
-... 
+The proposed implementation path can be broken down into three basic steps 
 
-CONTRIBUTIONS
-<name> 
-<filename>: <LINENO>, <LINENO>... 
-...
-...
-
-```
-
-
+ 1) Research/development/community-engagement of core impermission protocols
+ 2) Initial implementation of protocols as a
+    [github-app](https://developer.github.com/apps/) (barring that repo owners
+    still have the capacity to block use of this app)
+ 3) Secondary Implementation as a
+    [Cosmos-SDK](https://github.com/cosmos/cosmos-sdk/) module built as a
+    modification of [GOGS](https://github.com/gogs/gogs)
 
