@@ -93,6 +93,7 @@ For thought, some initial metrics worth exploration include:
  - characters changes of code
  - characters changes of code comments
  - number of logical operators and definitions
+
 In addition these metrics may be weighted by agreed upon significance of:
  - a package, file, or function etc., 
  - contributions from specific users, 
